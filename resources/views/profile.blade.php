@@ -1,20 +1,21 @@
 @extends('layouts.main')
 @section('title')
-    <title>Register</title>
+    <title>Profile</title>
 @endsection
 @section('css')
 
 @endsection
 @section('content')
-    <div class="row align-items-center"
-         style="min-height: 80vh;">
-        <div class="col-md"></div>
-        <div class="col-md-5">
-            <div class="card my-3">
+    <div class="row mt-4">
+        <div class="col-md-3">
+            @include('component.profile-menu')
+        </div>
+        <div class="col-md-9">
+            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Register</h5>
+                    <h5 class="card-title">Profile</h5>
                     <hr>
-                    <form action="{{route('auth.register.store')}}"
+                    <form action="{{route('account.profile.update')}}"
                           method="post">
                         @csrf
                         <div class="form-group">
@@ -24,7 +25,7 @@
                                    class="form-control @error('first_name') is-invalid @enderror"
                                    id="first_name"
                                    placeholder="First name"
-                                   value="{{old('first_name')}}">
+                                   value="{{old('first_name') ?? auth()->user()->first_name}}">
                             @error('first_name')
                             <div class="invalid-feedback">{{$message}}</div>
                             @enderror
@@ -36,7 +37,7 @@
                                    class="form-control @error('last_name') is-invalid @enderror"
                                    id="last_name"
                                    placeholder="Last name"
-                                   value="{{old('last_name')}}">
+                                   value="{{old('last_name') ?? auth()->user()->last_name}}">
                             @error('last_name')
                             <div class="invalid-feedback">{{$message}}</div>
                             @enderror
@@ -48,37 +49,22 @@
                                    class="form-control @error('email') is-invalid @enderror"
                                    id="email"
                                    placeholder="Enter email"
-                                   value="{{old('email')}}">
+                                   value="{{old('email')  ?? auth()->user()->email}}">
                             @error('email')
-                            <div class="invalid-feedback">{{$message}}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password"
-                                   name="password"
-                                   class="form-control @error('password') is-invalid @enderror"
-                                   id="password"
-                                   placeholder="Password"
-                                   value="{{old('password')}}">
-                            @error('password')
                             <div class="invalid-feedback">{{$message}}</div>
                             @enderror
                         </div>
                         @include('component.messages')
                         <div class="text-center">
                             <button type="submit"
-                                    class="btn btn-primary">Register
+                                    class="btn btn-primary">
+                                Update Profile
                             </button>
-                        </div>
-                        <div class="pt-3">
-                            I have an <a href="{{route('auth.login')}}">account</a>?
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md"></div>
     </div>
 @endsection
 @section('js')

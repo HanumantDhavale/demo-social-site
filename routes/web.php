@@ -18,28 +18,63 @@ Route::get("/", [
     "as" => "site.home"
 ]);
 
-Route::get("/login", [
-    "middleware" => ["ss.guest"],
-    "uses" => "AuthController@login",
-    "as" => "auth.login"
-]);
-Route::post("/login", [
-    "middleware" => ["ss.guest"],
-    "uses" => "AuthController@check",
-    "as" => "auth.check"
-]);
+Route::group(["middleware" => ["ss.guest"]], function () {
+    Route::get("/login", [
+        "uses" => "AuthController@login",
+        "as" => "auth.login"
+    ]);
+    Route::post("/login", [
+        "uses" => "AuthController@check",
+        "as" => "auth.check"
+    ]);
+    Route::get("/register", [
+        "uses" => "AuthController@register",
+        "as" => "auth.register"
+    ]);
+    Route::post("/register", [
+        "uses" => "AuthController@store",
+        "as" => "auth.register.store"
+    ]);
 
-Route::get("/register", [
-    "middleware" => ["ss.guest"],
-    "uses" => "AuthController@register",
-    "as" => "auth.register"
-]);
-Route::post("/register", [
-    "middleware" => ["ss.guest"],
-    "uses" => "AuthController@store",
-    "as" => "auth.register.store"
-]);
-Route::get("/logout", [
-    "uses" => "AuthController@logout",
-    "as" => "auth.logout"
-]);
+    Route::get("/forgot-password", [
+        "uses" => "AuthController@forgotPassword",
+        "as" => "auth.forgot.password"
+    ]);
+    Route::post("/forgot-password", [
+        "uses" => "AuthController@resetLink",
+        "as" => "auth.reset.link"
+    ]);
+
+    Route::get("/reset-password", [
+        "uses" => "AuthController@resetPassword",
+        "as" => "auth.reset.password"
+    ]);
+    Route::post("/reset-password", [
+        "uses" => "AuthController@setNewPassword",
+        "as" => "auth.set.password"
+    ]);
+});
+
+Route::group(["middleware" => ["ss.auth"]], function () {
+    Route::get('/profile', [
+        "uses" => "AccountController@profile",
+        "as" => "account.profile"
+    ]);
+    Route::post('/profile', [
+        "uses" => "AccountController@updateProfile",
+        "as" => "account.profile.update"
+    ]);
+    Route::get('/change-password', [
+        "uses" => "AccountController@changePassword",
+        "as" => "account.password"
+    ]);
+    Route::post('/change-password', [
+        "uses" => "AccountController@updatePassword",
+        "as" => "account.password.update"
+    ]);
+    Route::get("/logout", [
+        "uses" => "AuthController@logout",
+        "as" => "auth.logout"
+    ]);
+});
+

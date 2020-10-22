@@ -33,4 +33,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function resetPassword()
+    {
+        return $this->hasOne(ResetPassword::class, 'user_id');
+    }
+
 }
