@@ -19,7 +19,7 @@
             </li>
             <li class="nav-item {{request()->route()->getName() == "site.home"?"active" : null}}">
                 <a class="nav-link"
-                   href="#">Link</a>
+                   href="#">Contact Us</a>
             </li>
         </ul>
         <div class="form-inline my-2 my-lg-0">

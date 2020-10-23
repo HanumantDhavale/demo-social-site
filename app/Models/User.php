@@ -39,4 +39,9 @@ class User extends Authenticatable
         return $this->hasOne(ResetPassword::class, 'user_id');
     }
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id');
+    }
+
 }

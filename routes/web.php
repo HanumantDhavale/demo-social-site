@@ -76,5 +76,15 @@ Route::group(["middleware" => ["ss.auth"]], function () {
         "uses" => "AuthController@logout",
         "as" => "auth.logout"
     ]);
+
+    Route::post('/post/store', [
+        "uses" => "PostController@create",
+        "as" => "post.create"
+    ]);
+
 });
 
+Route::post('/posts', [
+    "uses" => "PostController@listPosts",
+    "as" => "post.list"
+]);
