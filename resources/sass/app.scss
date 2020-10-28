@@ -6,3 +6,31 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+@import "~toastr/toastr";
+
+//Progress bar
+@import '~nprogress/nprogress.css';
+
+//Progress bar customizations
+#nprogress .bar {
+    height: 3px !important;
+}
+
+#nprogress .bar {
+    background: $progress_bar_color !important;
+    z-index: 999999;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px $progress_bar_color, 0 0 5px $progress_bar_color !important;
+}
+
+#nprogress .spinner {
+    z-index: 999999;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: $progress_bar_color !important;
+    border-left-color: $progress_bar_color !important;
+}

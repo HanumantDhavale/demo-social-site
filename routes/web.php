@@ -82,6 +82,11 @@ Route::group(["middleware" => ["ss.auth"]], function () {
         "as" => "post.create"
     ]);
 
+    Route::post('/post/like', [
+        "uses" => "PostController@doLike",
+        "as" => "post.like"
+    ]);
+
 });
 
 Route::post('/posts', [

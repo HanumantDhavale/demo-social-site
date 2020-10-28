@@ -70,7 +70,8 @@
                                    @change="uploadPostImages">
                         </div>
                         <div class="col-md-2 text-right">
-                            <button type="button"
+                            <button v-if="!form_busy"
+                                    type="button"
                                     @click="createPost"
                                     class="btn btn-sm btn-success">
                                 Post
@@ -89,10 +90,26 @@
                  :key="post.id"
                  class="card mt-4">
                 <div class="card-body">
+                    <a href="#">@{{post.owner.first_name}} @{{post.owner.last_name}}</a>
+                    <br>
+                    @{{ post.created_at }}
                     <h4 v-if="post.title">@{{ post.title }}</h4>
+                    <div class="row"
+                         v-if="post.images.length > 0">
+                        <div v-for="image of post.images"
+                             class="col-md">
+                            <img class="img-fluid"
+                                 :src="image.file"
+                                 :alt="post.title">
+                        </div>
+                    </div>
                     <p v-if="post.description">@{{ post.description }}</p>
                     <hr>
-                    100 likes, 10 comments
+                    <a href="JavaScript:void(0)"
+                       @click="doLike(post)">
+                        <span :class="{'fa fa-heart text-danger':post.like_by_me, 'fa fa-heart-o':!post.like_by_me}"></span>
+                    </a> @{{ post.likes_count }}
+                    <span class="fa fa-comment-o ml-2"></span> 10
                 </div>
             </div>
             <div v-else
@@ -100,6 +117,17 @@
                 <div class="card-body">
                     <h4>No posts available...</h4>
                 </div>
+            </div>
+            <div class="text-center p-4"
+                 v-if="load_posts">
+                Loading posts... <span class="fa fa-spin fa-circle-o-notch "></span>
+            </div>
+            <div class="p-3 text-center"
+                 v-if="!load_posts && start_post < total">
+                <button type="button"
+                        class="btn btn-primary btn-sm"
+                        @click="loadPosts">Load older posts
+                </button>
             </div>
         </div>
     </div>
@@ -114,7 +142,8 @@
                     title: null,
                     description: null,
                     images: []
-                }
+                },
+                form_busy: false
             },
             methods: {
                 uploadPostImages: function (e) {
@@ -128,7 +157,7 @@
                         reader.readAsDataURL(file);
                     } else {
                         $(e.target).val(null);
-                        alert('Invalid file format, only image file allow.');
+                        toastr['error']('Invalid file format, only image file allow.');
                     }
                 },
                 removePostImages: function (image) {
@@ -136,10 +165,11 @@
                 },
                 createPost: async function () {
                     if (!this.form.title && !this.form.description && this.form.images.length < 1) {
-                        alert('At least title or description or image required');
+                        toastr['error']('At least title or description or image required');
                         return 0;
                     }
-
+                    this.form_busy = true;
+                    nProgress.start();
                     try {
                         const response = await axios.post('{{route('post.create')}}', this.form);
                         this.form = {
@@ -151,15 +181,19 @@
                             response.data.created_post,
                             ...manage_posts.posts
                         ];
-                        alert(response.data.message);
+                        toastr['success'](response.data.message);
+                        nProgress.done();
+                        this.form_busy = false;
                     } catch (e) {
                         console.log(e);
                         if (e.response.status === 419) {
-                            alert(e.response.data.message);
+                            toastr['error'](e.response.data.message);
                         }
                         if (e.response.status === 400) {
-                            alert(e.response.data.message);
+                            toastr['error'](e.response.data.message);
                         }
+                        nProgress.done();
+                        this.form_busy = false;
                     }
                     ;
                 }
@@ -169,21 +203,54 @@
             name: 'Manage posts',
             el: '#manage-posts',
             data: {
-                posts: []
+                posts: [],
+                load_posts: false,
+                start_post: 0,
+                limit: 5,
+                total: 0
             },
             mounted: async function () {
                 await this.loadPosts();
             },
             methods: {
                 loadPosts: async function () {
+                    this.load_posts = true;
+                    nProgress.start();
                     try {
-                        const response = await axios.post(`{{route('post.list')}}`);
+                        const response = await axios.post(`{{route('post.list')}}?limit=${this.limit}&start_post=${this.start_post}`);
+                        this.start_post = this.start_post + this.limit;
+                        this.total = response.data.total;
                         this.posts = [
-                            ...response.data,
-                            ...this.posts
+                            ...this.posts,
+                            ...response.data.posts
                         ];
+                        nProgress.done();
+                        this.load_posts = false;
                     } catch (e) {
                         console.log(e);
+                        nProgress.done();
+                        this.load_posts = false;
+                    }
+                },
+                doLike: async function (post) {
+                    nProgress.start();
+                    try {
+                        const response = await axios.post(`{{route('post.like')}}`, {
+                            post_id: post.id
+                        });
+                        //response.data
+                        this.posts.map((post, i) => {
+                            if (post.id === response.data.id) {
+                                this.posts[i].likes_count = response.data.likes_count;
+                                this.posts[i].like_by_me = response.data.like_by_me;
+                            }
+                        });
+                        nProgress.done();
+                    } catch (e) {
+                        if (e.response.status === 419) {
+                            toastr['error']('For like any post you need to login!');
+                        }
+                        nProgress.done();
                     }
                 }
             }
