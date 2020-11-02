@@ -14,7 +14,7 @@ class Post extends Model
         'status',
     ];
 
-    protected $appends = ['like_by_me'];
+    protected $appends = ['like_by_me', 'profile_url'];
 
     public function owner()
     {
@@ -42,6 +42,20 @@ class Post extends Model
             return false;
         $liked_by_me = $this->likes()->where('user_id', auth()->user()->id)->first();
         return !empty($liked_by_me) ? true : false;
+    }
+
+    public function getProfileUrlAttribute()
+    {
+        if (!auth()->check()) {
+            $profile_url = route('user.profile', $this->owner->id);;
+        } else {
+            if ($this->owner->id === auth()->user()->id) {
+                $profile_url = route('account.profile');
+            } else {
+                $profile_url = route('user.profile', $this->owner->id);;
+            }
+        }
+        return $profile_url;
     }
 
 }

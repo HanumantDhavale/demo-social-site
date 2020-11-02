@@ -90,7 +90,7 @@
                  :key="post.id"
                  class="card mt-4">
                 <div class="card-body">
-                    <a href="#">@{{post.owner.first_name}} @{{post.owner.last_name}}</a>
+                    <a :href="post.profile_url">@{{post.owner.first_name}} @{{post.owner.last_name}}</a>
                     <br>
                     @{{ post.created_at }}
                     <h4 v-if="post.title">@{{ post.title }}</h4>
@@ -218,6 +218,7 @@
                     nProgress.start();
                     try {
                         const response = await axios.post(`{{route('post.list')}}?limit=${this.limit}&start_post=${this.start_post}`);
+                        console.log(response.data);
                         this.start_post = this.start_post + this.limit;
                         this.total = response.data.total;
                         this.posts = [

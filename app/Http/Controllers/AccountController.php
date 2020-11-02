@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -43,4 +44,45 @@ class AccountController extends Controller
         auth()->user()->update(['password' => bcrypt($request->new_password)]);
         return redirect()->back()->with('success', 'Your account password updated, Please login with new password for next time');
     }
+
+    public function followers()
+    {
+        return view('followers');
+    }
+
+    public function followings()
+    {
+        return view('followings');
+    }
+
+    public function userProfile(User $user)
+    {
+        return view('user-profile', [
+            'user' => $user
+        ]);
+    }
+
+    public function doFollow(User $user)
+    {
+        $user->followings()->detach(auth()->user()->id);
+        $user->followings()->attach(auth()->user()->id);
+        return redirect()->back();
+    }
+
+    public function doUnFollow(User $user)
+    {
+        $user->followings()->detach(auth()->user()->id);
+        return redirect()->back();
+    }
+
+    public function userFollowers(User $user)
+    {
+        return view('user-followers', compact('user'));
+    }
+
+    public function userFollowings(User $user)
+    {
+        return view('user-followings', compact('user'));
+    }
+
 }

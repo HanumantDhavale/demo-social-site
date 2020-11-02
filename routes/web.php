@@ -68,6 +68,14 @@ Route::group(["middleware" => ["ss.auth"]], function () {
         "uses" => "AccountController@changePassword",
         "as" => "account.password"
     ]);
+    Route::get('/followers', [
+        "uses" => "AccountController@followers",
+        "as" => "account.followers"
+    ]);
+    Route::get('/followings', [
+        "uses" => "AccountController@followings",
+        "as" => "account.followings"
+    ]);
     Route::post('/change-password', [
         "uses" => "AccountController@updatePassword",
         "as" => "account.password.update"
@@ -87,9 +95,32 @@ Route::group(["middleware" => ["ss.auth"]], function () {
         "as" => "post.like"
     ]);
 
+    Route::get('/follow/{user}', [
+        "uses" => "AccountController@doFollow",
+        "as" => "follow.user"
+    ]);
+    Route::get('/unfollow/{user}', [
+        "uses" => "AccountController@doUnFollow",
+        "as" => "unfollow.user"
+    ]);
 });
 
 Route::post('/posts', [
     "uses" => "PostController@listPosts",
     "as" => "post.list"
+]);
+
+Route::get('/{user}/profile', [
+    "uses" => "AccountController@userProfile",
+    "as" => "user.profile"
+]);
+
+Route::get('/{user}/followers', [
+    "uses" => "AccountController@userFollowers",
+    "as" => "user.followers"
+]);
+
+Route::get('/{user}/followings', [
+    "uses" => "AccountController@userFollowings",
+    "as" => "user.followings"
 ]);
