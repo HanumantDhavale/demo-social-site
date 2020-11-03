@@ -46,11 +46,15 @@ class PostController extends Controller
         $start_post = $request->start_post;
         $posts = Post::with('owner', 'images')
             ->withCount('likes')
+            ->withCount('comments')
+            ->userIs($request->user)
             ->orderBy('created_at', 'desc')
             ->skip($start_post)
             ->take($limit)
             ->get();
-        return response()->json(['posts' => $posts, 'total' => Post::count()], 200);
+        foreach ($posts as $post)
+            $post->comments = $post->comments()->take(2)->get();
+        return response()->json(['posts' => $posts, 'total' => Post::userIs($request->user)->count()], 200);
     }
 
     public function doLike(Request $request)
@@ -62,6 +66,36 @@ class PostController extends Controller
             return response()->json($post, 200);
         } catch (\Exception $exception) {
 
+        }
+    }
+
+    public function doComment(Request $request)
+    {
+        $post_id = $request->post_id;
+        $comment = $request->comment;
+        try {
+            $created_comment = auth()->user()->comments()->create([
+                'post_id' => $post_id,
+                'comment' => $comment
+            ]);
+            $created_comment->commentor = $created_comment->commentor;
+            $post = Post::find($post_id);
+            $count = $post->comments()->count();
+            return response()->json(['comment' => $created_comment, 'comments_count' => $count], 200);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 400);
+        }
+    }
+
+    public function allComments(Request $request)
+    {
+        $post_id = $request->post_id;
+        try {
+            $post = Post::find($post_id);
+            $comments = $post->comments;
+            return response()->json(['comments' => $comments, 'post_id' => $post_id], 200);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 400);
         }
     }
 }

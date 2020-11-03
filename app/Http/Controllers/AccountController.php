@@ -85,4 +85,14 @@ class AccountController extends Controller
         return view('user-followings', compact('user'));
     }
 
+    public function myPosts()
+    {
+        return view('my-posts');
+    }
+
+    public function userPosts(User $user)
+    {
+        return view('user-posts', compact('user'));
+    }
+
 }

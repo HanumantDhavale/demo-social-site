@@ -103,6 +103,14 @@ Route::group(["middleware" => ["ss.auth"]], function () {
         "uses" => "AccountController@doUnFollow",
         "as" => "unfollow.user"
     ]);
+    Route::get('/my/posts', [
+        "uses" => "AccountController@myPosts",
+        "as" => "account.posts"
+    ]);
+    Route::post('/comment', [
+        "uses" => "PostController@doComment",
+        "as" => "post.comment"
+    ]);
 });
 
 Route::post('/posts', [
@@ -123,4 +131,14 @@ Route::get('/{user}/followers', [
 Route::get('/{user}/followings', [
     "uses" => "AccountController@userFollowings",
     "as" => "user.followings"
+]);
+
+Route::get('/{user}/posts', [
+    "uses" => "AccountController@userPosts",
+    "as" => "user.posts"
+]);
+
+Route::post('/all/comments', [
+    "uses" => "PostController@allComments",
+    "as" => "all.comments"
 ]);

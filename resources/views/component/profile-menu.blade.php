@@ -11,6 +11,9 @@
     <li class="list-group-item {{request()->route()->getName() == "account.password"?"active" : null}}">
         <a href="{{route('account.password')}}">Change Password</a>
     </li>
+    <li class="list-group-item {{request()->route()->getName() == "account.posts"?"active" : null}}">
+        <a href="{{route('account.posts')}}">Posts</a>
+    </li>
     <li class="list-group-item {{request()->route()->getName() == "account.followers"?"active" : null}}">
         <a href="{{route('account.followers')}}">Followers</a>
     </li>
